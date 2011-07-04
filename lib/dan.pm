@@ -12,10 +12,10 @@ our $VERSION = '0.1';
 
 
 my $post_dir = dir("$FindBin::Bin/../posts");
+my @post_files = grep { -f and $_->basename =~ /\.md/ } $post_dir->children;
+my @posts = map { file2post( $_ ) } @post_files;
 
 get '/' => sub {
-    my @post_files = grep { -f and $_->basename =~ /\.md/ } $post_dir->children;
-    my @posts = map { file2post( $_ ) } @post_files;
     var posts => \@posts;
     template 'index', vars;
 };
@@ -23,9 +23,17 @@ get '/' => sub {
 get '/post/:name' => sub {
     my $name = params->{'name'};
     $name =~ s/\.html/\.md/g;
-    my $file = $post_dir->file( $name );
-    my $post = file2post( $file );
-    var post => $post;
+    for ( 0 .. $#posts ){
+        if ( $name eq $posts[$_]->{'name'} ){
+            var post => $posts[$_];
+        }
+        if ( $_ > 0 ){
+            var prev_post => $posts[$_-1];
+        }
+        if ( $_ < $#posts ){
+            var next_post => $posts[$_+1];
+        }
+    }
     template 'post', vars;
 };
 
@@ -42,6 +50,7 @@ sub file2post {
     $uri =~ s/\.md$/\.html/;
 
     my $post = {
+        name => $file->basename,
         title => $meta->{'title'},
         slug => $meta->{'slug'},
         date => date($meta->{'date'}),

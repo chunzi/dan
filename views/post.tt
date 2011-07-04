@@ -1,3 +1,9 @@
 [% post.html %]
 
 <div class="date">[% post.date %]</div>
+
+<div style="text-align: center; margin-top: 4em;">
+    <a href="/post/[% prev_post.uri %]">[% prev_post.title %]</a>
+    <span style="color: gray;">&nbsp;|&nbsp;</span>
+    <a href="/post/[% next_post.uri %]">[% next_post.title %]</a>
+</div>
