@@ -10,7 +10,6 @@ use Class::Date qw/ date /;
 our $VERSION = '0.1';
 
 
-
 my $post_dir = dir("$FindBin::Bin/../posts");
 my @post_files = grep { -f and $_->basename =~ /\.md/ } $post_dir->children;
 my @posts = map { file2post( $_ ) } @post_files;
@@ -25,7 +24,7 @@ get '/post/:name' => sub {
     $name =~ s/\.html/\.md/g;
     for ( 0 .. $#posts ){
         if ( $name eq $posts[$_]->{'name'} ){
-            var post => $posts[$_];
+            var post => file2post($posts[$_]->{'file'});
             if ( $_ > 0 ){
                 var prev_post => $posts[$_-1];
             }
@@ -37,6 +36,10 @@ get '/post/:name' => sub {
     }
     template 'post', vars;
 };
+
+sub get_posts {
+    return @posts;
+}
 
 sub file2post {
     my $file = shift;
@@ -51,6 +54,7 @@ sub file2post {
     $uri =~ s/\.md$/\.html/;
 
     my $post = {
+        file => $file,
         name => $file->basename,
         title => $meta->{'title'},
         slug => $meta->{'slug'},
