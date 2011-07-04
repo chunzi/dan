@@ -90,6 +90,8 @@ sub html2markdown {
     $str =~ s/^\s*<li>(.*?)<\/li>/- $1/smg;
     $str =~ s/\n<pre lang=".*?">//smg;
     $str =~ s/<\/pre>\n//smg;
+    $str =~ s/<code>/`/smg;
+    $str =~ s/<\/code>/`/smg;
     return $str;
 }
 
