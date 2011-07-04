@@ -1,0 +1,15 @@
+body { 
+    background-image: url("/images/bg.png"); 
+    font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
+    font-size: 1em;
+    color: #666;
+    margin: 2em 0 6em;
+} 
+.post { background: white; padding: 5em 4em; }
+.post p { margin: 1.7em 0; font-size: 0.9em; line-height: 1.8em; }
+.round {
+    border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}

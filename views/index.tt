@@ -1,0 +1,5 @@
+<ul>
+[% FOREACH post = posts %]
+<li>[% post.date.ymd %] - <a href="/post/[% post.uri %]">[% post.title %]</a></li>
+[% END %]
+</ul>
