@@ -28,3 +28,4 @@ body {
     font-style: italic;
     margin: 1.8em;
 }
+.post div.date { text-align: right; font-size: 0.8em; color: #aaa; margin-top: 4em; }
