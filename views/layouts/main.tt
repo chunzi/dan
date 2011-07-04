@@ -18,10 +18,10 @@
 </head>
 <body>
     <div class="container_12">
-        <div class="grid_9">
+        <div class="grid_10">
             <div class="post round">[% content %]</div>
         </div>
-        <div class="grid_3">
+        <div class="grid_2">
         </div>
     </div>
 </body>
