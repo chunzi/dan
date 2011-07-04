@@ -26,12 +26,13 @@ get '/post/:name' => sub {
     for ( 0 .. $#posts ){
         if ( $name eq $posts[$_]->{'name'} ){
             var post => $posts[$_];
-        }
-        if ( $_ > 0 ){
-            var prev_post => $posts[$_-1];
-        }
-        if ( $_ < $#posts ){
-            var next_post => $posts[$_+1];
+            if ( $_ > 0 ){
+                var prev_post => $posts[$_-1];
+            }
+            if ( $_ < $#posts ){
+                var next_post => $posts[$_+1];
+            }
+            last;
         }
     }
     template 'post', vars;
