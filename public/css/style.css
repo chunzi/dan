@@ -14,7 +14,8 @@ body {
 
 .post { background: white; padding: 5em 4em; font-size: 0.9em; }
 .post p { margin: 1.7em 0; line-height: 1.8em; }
-.post p code, .post li code { color: #C00; }
+.post code { color: #C00; }
+.post pre code { color: #F3F3F3; }
 .post pre {
     background-image: url("/images/gray_sand.gif");
     color: #F3F3F3;
