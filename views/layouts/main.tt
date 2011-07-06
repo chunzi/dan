@@ -4,19 +4,12 @@
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=[% settings.charset %]" />
     <title>dan</title>
-    <link rel="stylesheet" href="[% request.uri_base %]/css/reset.css" />
-    <link rel="stylesheet" href="[% request.uri_base %]/css/text.css" />
-    <link rel="stylesheet" href="[% request.uri_base %]/css/960.css" />
     <link rel="stylesheet" href="[% request.uri_base %]/css/style.css" />
     <script type="text/javascript" src="[% request.uri_base %]/javascripts/jquery.js"></script>
 </head>
 <body>
-    <div class="container_12">
-        <div class="grid_10">
-            <div class="post round">[% content %]</div>
-        </div>
-        <div class="grid_2">
-        </div>
+    <div class="container">
+        <div class="post round">[% content %]</div>
     </div>
 </body>
 </html>

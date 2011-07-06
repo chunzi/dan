@@ -1,32 +1,40 @@
 body { 
-    background-image: url("/images/bg.png"); 
     font-family: "Lucida Grande",Helvetica,Arial,Verdana,sans-serif;
-    font-size: 1em;
+    background-image: url("/images/bg.png"); 
     color: #333;
     margin: 2em 0 6em;
 } 
+a:focus, a:hover { color: #0099FF; }
+a { color: #0066CC; text-decoration: none; }
+
+.container { width: 772px; margin: 0 auto; }
 .round {
     border-radius: 5px;
     -webkit-border-radius: 5px;
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-
-.post { background: white; padding: 5em 4em; font-size: 0.9em; }
-.post p { margin: 1.7em 0; line-height: 1.8em; }
-.post code { color: #C00; }
-.post pre code { color: #F3F3F3; }
-.post pre {
-    background-image: url("/images/gray_sand.gif");
-    color: #F3F3F3;
-    margin: 1.7em 0;
-    overflow-x: hidden;
-    padding: 10px 14px;
-    font-size: 0.9em;
+.post { color: #345; background: #FFF; padding: 70px 80px; font-size: 0.9em; line-height: 1.8; }
+h1, h2, h3, h4, h5, h6 { color: #111111; font-weight: normal; }
+h1 { margin: 0 0 40px; }
+p { margin: 0 0 1.5em;  }
+pre, code {
+    font-family: 'andale mono','lucida console',monospace;
+    line-height: 1.5;
 }
-.post blockquote {
+pre {
+    background-image: url("/images/gray_sand.gif");
+    margin: 0 0 1.5em;
+    overflow-x: hidden;
+    padding: 0.8em;
+}
+code { color: #C00; }
+pre code { color: #EEE; font-size: 0.9em; }
+
+blockquote {
     color: #666;
     font-style: italic;
     margin: 1.8em;
 }
-.post div.date { text-align: right; font-size: 0.8em; color: #aaa; margin-top: 4em; }
+
+div.date { text-align: right; font-size: 0.8em; color: #aaa; margin-top: 4em; }
