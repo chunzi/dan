@@ -3,13 +3,13 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-type" content="text/html; charset=[% settings.charset %]" />
-    <title>dan</title>
+    <title>[% post.title %]</title>
     <link rel="stylesheet" href="[% request.uri_base %]/css/style.css" />
     <script type="text/javascript" src="[% request.uri_base %]/javascripts/jquery.js"></script>
 </head>
 <body>
     <div class="container">
-        <div class="post round">[% content %]</div>
+        [% content %]
     </div>
 </body>
 </html>
