@@ -1,6 +1,8 @@
+[% USE date( format = '%A, %B %e, %Y' ) %]
+
 <div class="post round">
     [% post.html %]
-    <div class="date">[% post.date.monthname %] [% post.date.day %], [% post.date.year %]</div>
+    <div class="date">[% date.format( post.date.epoch ) %]</div>
 </div>
 
 <div class="tail" style="text-align: center;">
@@ -9,12 +11,16 @@
 
 <div class="tail">
     <div class="older">
-        <a href="/post/[% prev_post.uri %]">[% prev_post.title %]</a><br />
-        [% prev_post.date.monthname %] [% prev_post.date.day %], [% prev_post.date.year %]
+        <a href="/post/[% prev_post.uri %]">
+            <div class="title">[% prev_post.title %]</div>
+            <div class="date">[% date.format( prev_post.date.epoch ) %]</div>
+        </a>
     </div>
     <div class="newer">
-        <a href="/post/[% next_post.uri %]">[% next_post.title %]</a><br />
-        [% next_post.date.monthname %] [% next_post.date.day %], [% next_post.date.year %]
+        <a href="/post/[% next_post.uri %]">
+            <div class="title">[% next_post.title %]</div>
+            <div class="date">[% date.format( next_post.date.epoch ) %]</div>
+        </a>
     </div>
     <div class="clear"></div>
 </div>
