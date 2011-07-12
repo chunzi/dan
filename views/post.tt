@@ -3,9 +3,21 @@
     <div class="date">[% post.date.monthname %] [% post.date.day %], [% post.date.year %]</div>
 </div>
 
-
-<div style="text-align: center; margin-top: 2em;">
-    <a href="/post/[% prev_post.uri %]">Older</a>
-    <span style="color: silver;">&nbsp;|&nbsp;</span>
-    <a href="/post/[% next_post.uri %]">Newer</a>
+<div class="tail" style="text-align: center;">
+        <a href="/">Home</a><br />
 </div>
+
+<div class="tail">
+    <div class="older">
+        <a href="/post/[% prev_post.uri %]">[% prev_post.title %]</a><br />
+        [% prev_post.date.monthname %] [% prev_post.date.day %], [% prev_post.date.year %]
+    </div>
+    <div class="newer">
+        <a href="/post/[% next_post.uri %]">[% next_post.title %]</a><br />
+        [% next_post.date.monthname %] [% next_post.date.day %], [% next_post.date.year %]
+    </div>
+    <div class="clear"></div>
+</div>
+
+
+
