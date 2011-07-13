@@ -5,7 +5,7 @@ our $VERSION = '0.01';
 
 use Git::Repository;
 
-my $dir = '/Users/chunzi/github/dan-posts';
+my $dir = '/Users/chunzi/github/chunzi.dan';
 my $r = Git::Repository->new( work_tree => $dir );
 
 

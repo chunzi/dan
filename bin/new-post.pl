@@ -6,7 +6,7 @@ our $VERSION = '0.01';
 use File::Slurp::Unicode;
 use Class::Date qw/ date -DateParse /;
 
-our $dir = '/Users/chunzi/github/dan-posts'; 
+our $dir = '/Users/chunzi/github/chunzi.dan/posts'; 
 
 my $today = date( time );
 my $filename = sprintf "%s/%s-slug.md", $dir, $today->strftime( '%Y-%m-%d' );

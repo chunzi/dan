@@ -6,7 +6,7 @@ our $VERSION = '0.01';
 use File::Slurp::Unicode;
 use Class::Date qw/ date -DateParse /;
 
-our $dir = '/Users/chunzi/github/dan-taskpapers'; 
+our $dir = '/Users/chunzi/github/chunzi.dan/taskpapers'; 
 
 my $today = date( time );
 my $filename = sprintf "%s/%s.taskpaper", $dir, $today->strftime( '%Y-%m-%d' );
