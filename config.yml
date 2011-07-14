@@ -7,3 +7,9 @@ engines:
     encoding:  'utf8'
     start_tag: '[%'
     end_tag:   '%]'
+plugins:
+  Feed:
+    title: chunzi.me
+    copyright: chunzi
+    tagline: chunzi blog
+    description: chunzi.me

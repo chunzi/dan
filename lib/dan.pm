@@ -2,6 +2,7 @@ package dan;
 
 use FindBin;
 use Dancer ':syntax';
+use Dancer::Plugin::Feed;
 use Text::Markdown qw/ markdown /;
 use Path::Class;
 use File::Slurp::Unicode;
@@ -12,7 +13,7 @@ our $VERSION = '0.1';
 
 my $post_dir = dir("$FindBin::Bin/../posts");
 my @post_files = grep { -f and $_->basename =~ /\.md/ } $post_dir->children;
-my @posts = map { file2post( $_ ) } @post_files;
+my @posts = reverse map { file2post( $_ ) } @post_files;
 
 get '/' => sub {
     var posts => \@posts;
@@ -37,9 +38,16 @@ get '/post/:name' => sub {
     template 'post', vars;
 };
 
+get '/feed' => sub {
+    create_rss_feed(
+        entries => [ map {  { title => $_->{'title'}, content => $_->{'html'} }  } @posts[0..6] ],
+    );
+};
+
 sub get_posts {
     return @posts;
 }
+
 
 sub file2post {
     my $file = shift;
