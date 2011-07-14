@@ -12,7 +12,7 @@ my $today = date( time );
 my $filename = sprintf "%s/%s.taskpaper", $dir, $today->strftime( '%Y-%m-%d' );
 
 unless ( -f $filename ){
-    my $text = sprintf "%s:\n\n\t- ", $today->strftime( '%b %3, %Y' );
+    my $text = sprintf "%s:\n\n\t- ", $today->strftime( '%b %e, %Y' );
     write_file( $filename, $text );
     printf STDERR "Created %s\n", $filename;
 }
