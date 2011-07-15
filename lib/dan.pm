@@ -3,36 +3,30 @@ package dan;
 use FindBin;
 use Dancer ':syntax';
 use Dancer::Plugin::Feed;
-use Text::Markdown qw/ markdown /;
 use Path::Class;
-use File::Slurp::Unicode;
-use Class::Date qw/ date /;
-use Data::Dumper;
 use dan::entry;
+use dan::channel;
 
 our $VERSION = '0.1';
 
 
-my $post_dir = dir("$FindBin::Bin/../posts");
-my @post_files = grep { -f and $_->basename =~ /\.md/ } $post_dir->children;
-my @posts = reverse map { dan::entry->new( $_ ) } @post_files;
+my $data_dir = dir("$FindBin::Bin/../data");
+my $posts = dan::channel->new({ name => 'post', path => './data/posts' });
+$posts->sync;
+my $en = $posts->entries;
 
 get '/' => sub {
-    var posts => [ @posts[0..19] ];
+    var posts => [ @$en[0..19] ];
     template 'index', vars;
 };
 
 get '/post/:uri' => sub {
     my $uri = params->{'uri'};
-    for ( 0 .. $#posts ){
-        if ( $uri eq $posts[$_]->uri ){
-            var post => $posts[$_];
-            if ( $_ > 0 ){
-                var prev_post => $posts[$_-1];
-            }
-            if ( $_ < $#posts ){
-                var next_post => $posts[$_+1];
-            }
+    for ( 0 .. $#{$en} ){
+        if ( $uri eq $en->[$_]{'uri'} ){
+            my $post = dan::entry->new( $en->[$_]{'path'} );
+            $post->parse;
+            var post => $post;
             last;
         }
     }
@@ -47,7 +41,7 @@ get '/feed' => sub {
                 issued   => $_->issued,
                 modified => $_->modified,
                 link     => $_->uri,
-            }} @posts[ 0 .. 6 ]
+            }} $en->[ 0 .. 6 ]
         ],
     );
 };

@@ -8,6 +8,7 @@ use File::Slurp::Unicode;
 use Path::Class;
 use Text::Markdown qw/ markdown /;
 use YAML::Syck;
+use Digest::SHA1  qw/ sha1_hex /;
 use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(qw/ path title slug body created updated day format /);
@@ -19,9 +20,19 @@ sub new {
 
     my $self = bless {}, $class;
     $self->path( "$path" );
-    $self->parse;
 
     return $self;
+}
+
+sub shape {
+    my $self = shift;
+    my $path = file $self->path;
+    my $shape = sha1_hex( 
+        map { sha1_hex( $_ ) } ( 
+            $path->basename, 
+            $path->stat->ctime, $path->stat->mtime, 
+        ));
+    return $shape;
 }
 
 sub parse {
