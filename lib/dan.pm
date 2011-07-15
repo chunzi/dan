@@ -7,25 +7,26 @@ use Text::Markdown qw/ markdown /;
 use Path::Class;
 use File::Slurp::Unicode;
 use Class::Date qw/ date /;
+use Data::Dumper;
+use dan::entry;
 
 our $VERSION = '0.1';
 
 
 my $post_dir = dir("$FindBin::Bin/../posts");
 my @post_files = grep { -f and $_->basename =~ /\.md/ } $post_dir->children;
-my @posts = reverse map { file2post( $_ ) } @post_files;
+my @posts = reverse map { dan::entry->new( $_ ) } @post_files;
 
 get '/' => sub {
-    var posts => \@posts;
+    var posts => [ @posts[0..19] ];
     template 'index', vars;
 };
 
-get '/post/:name' => sub {
-    my $name = params->{'name'};
-    $name =~ s/\.html/\.md/g;
+get '/post/:uri' => sub {
+    my $uri = params->{'uri'};
     for ( 0 .. $#posts ){
-        if ( $name eq $posts[$_]->{'name'} ){
-            var post => file2post($posts[$_]->{'file'});
+        if ( $uri eq $posts[$_]->uri ){
+            var post => $posts[$_];
             if ( $_ > 0 ){
                 var prev_post => $posts[$_-1];
             }
@@ -40,37 +41,17 @@ get '/post/:name' => sub {
 
 get '/feed' => sub {
     create_rss_feed(
-        entries => [ map {  { title => $_->{'title'}, content => $_->{'html'} }  } @posts[0..6] ],
+        entries => [ map {{
+                title    => $_->title,
+                content  => $_->content_without_title,
+                issued   => $_->issued,
+                modified => $_->modified,
+                link     => $_->uri,
+            }} @posts[ 0 .. 6 ]
+        ],
     );
 };
 
-sub get_posts {
-    return @posts;
-}
 
-
-sub file2post {
-    my $file = shift;
-    my $lines = read_file("$file");
-    my ( $header, $body ) = split "\n\n", $lines, 2;
-    my $meta = {};
-    map { 
-        my ( $key, $value ) = split /\:/, $_, 2;
-        $meta->{$key} = $value;
-    } split "\n", $header;
-    my $uri = $file->basename;
-    $uri =~ s/\.md$/\.html/;
-
-    my $post = {
-        file => $file,
-        name => $file->basename,
-        title => $meta->{'title'},
-        slug => $meta->{'slug'},
-        date => date($meta->{'date'}),
-        uri => $uri,
-        html => markdown( $body || '' ),
-    };
-    return $post;
-}
 
 true;

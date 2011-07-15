@@ -1,8 +1,6 @@
-[% USE date( format = '%A, %B %e, %Y' ) %]
-
 <div class="post round">
-    [% post.html %]
-    <div class="date">[% date.format( post.date.epoch ) %]</div>
+    [% post.content %]
+    <div class="date">[% post.created.strftime('%A, %B %e, %Y') %]</div>
 </div>
 
 <div class="tail" style="text-align: center;">
@@ -13,13 +11,13 @@
     <div class="older">
         <a href="/post/[% prev_post.uri %]">
             <div class="title">[% prev_post.title %]</div>
-            <div class="date">[% date.format( prev_post.date.epoch ) %]</div>
+            <div class="date">[% prev_post.created.strftime('%A, %B %e, %Y') %]</div>
         </a>
     </div>
     <div class="newer">
         <a href="/post/[% next_post.uri %]">
             <div class="title">[% next_post.title %]</div>
-            <div class="date">[% date.format( next_post.date.epoch ) %]</div>
+            <div class="date">[% next_post.created.strftime('%A, %B %e, %Y') %]</div>
         </a>
     </div>
     <div class="clear"></div>

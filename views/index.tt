@@ -1,5 +1,10 @@
-<ul>
-[% FOREACH post = posts %]
-<li>[% post.date.ymd %] - <a href="/post/[% post.uri %]">[% post.title %]</a></li>
-[% END %]
+<div class="entries round">
+<ul class="entries">
+    [% FOREACH post = posts %]
+    <li>
+        <span class="created">[% post.created.strftime("%d %b %Y") %]</span>
+        <span class="title"><a href="/post/[% post.uri %]">[% post.title %]</a><span>
+    </li>
+    [% END %]
 </ul>
+</div>
