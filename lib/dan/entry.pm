@@ -8,7 +8,6 @@ use File::Slurp::Unicode;
 use Path::Class;
 use Text::Markdown qw/ markdown /;
 use YAML::Syck;
-use Digest::SHA1  qw/ sha1_hex /;
 use base 'Class::Accessor::Fast';
 
 __PACKAGE__->mk_accessors(qw/ 
@@ -46,9 +45,13 @@ sub parse {
     $self->slug( $slug );
     $self->format( $format );
 
+    $self->created( date $path->stat->ctime );
+    $self->updated( date $path->stat->mtime );
+
     # from content
     $self->_parse_markdown if $format eq 'markdown';
     $self->_parse_taskpaper if $format eq 'taskpaper';
+
 
     return $self;
 }

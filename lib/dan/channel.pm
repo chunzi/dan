@@ -5,73 +5,103 @@ use warnings;
 use Class::Date qw/ date /;
 use Path::Class;
 use dan::entry;
-use Storable;
+use Data::Page;
+use Digest::SHA1  qw/ sha1_hex /;
 use base 'Class::Accessor::Fast';
 
-__PACKAGE__->mk_accessors(qw/ path name /);
+__PACKAGE__->mk_accessors(qw/ path name dbfile db /);
 
+sub new {
+    my $class = shift;
+    my $path = shift;
+    return unless -d $path;
 
-sub dbfile {
-    my $self = shift;
-    my $dbfile = file( $self->path, 'index.db' )->stringify;
-    return $dbfile;
+    my $self = bless {}, $class;
+
+    $self->path( $path );
+    $self->db( { mtime => 0, files => {} } );
+    $self->sync;
+
+    return $self;
 }
+
 
 sub sync {
     my $self = shift;
+    my $db = $self->db;
 
-    # bless all the files as entry object
-    my @entries = 
-        map { dan::entry->new($_) }
-        grep { $_->basename !~ /\.db$/ } 
-        grep { $_->basename !~ /^\./ } 
-        grep { -f } dir( $self->path )->children;
+    my $mtime = (stat( $self->path ))[9];
+    return if ( exists $db->{'mtime'} and $db->{'mtime'} == $mtime );
 
-    # load previous index, prepare a list to remove old caches
-    my $index = $self->load_index_db;
-    my $remove = {}; map { $remove->{$_}++ } keys %$index;
+    $db->{'mtime'} = $mtime;
+    my $index = $db->{'files'};
 
-    for my $entry ( @entries ){
-        my $path = $entry->path;
-        my $mtime = $entry->mtime;
+    my @path = 
+        map { $_->stringify } map { $_->absolute }
+        grep { $_->basename !~ /\.db$/ } grep { -f } 
+        dir( $self->path )->children( no_hidden => 1 );
 
-        # skip the same ones
-        if ( exists $index->{$path} and $index->{$path}{'mtime'} == $mtime ){
-            delete $remove->{$path};
-            next;
+
+    my $remove = {};
+    map { $remove->{$_}++ } keys %{$db->{'files'}};
+    for my $path ( @path ){
+        my $mtime = (stat $path)[9];
+        my $sha = sha1_hex( $path, $mtime );
+
+        if ( not exists $index->{$sha} ){
+            my $entry = dan::entry->new( $path );
+            $entry->parse;
+            $index->{$sha} = $entry;
+
+        }else{
+            delete $remove->{$sha};
         }
-
-        # attach updated or newly added
-        $entry->parse;
-        $index->{$path} = {
-            mtime   => $mtime,
-            path    => $path,
-            uri     => $entry->uri,
-            title   => $entry->title,
-            created => $entry->created,
-            epoch   => $entry->created->epoch,
-        };
     }
-
-    # remove the missing ones
     map { delete $index->{$_} } keys %$remove;
 
-    my $dbfile = $self->dbfile;
-    store $index, $dbfile;
 }
 
-sub load_index_db {
+sub page {
     my $self = shift;
-    my $dbfile = $self->dbfile;
-    my $index = -f $dbfile ? retrieve $dbfile : {};
-    return $index;
+    my $cur_page = shift || 1;
+    my $per_page = shift || 1;
+
+    my @entries = $self->entries;
+    my $total = scalar @entries;
+
+    my $page = Data::Page->new();
+    $page->total_entries( $total );
+    $page->entries_per_page( $per_page );
+    $page->current_page( $cur_page );
+    my @show = $page->splice( \@entries );
+
+    return @show;
+}
+
+sub find {
+    my $self = shift;
+    my $uri = shift;
+
+    my @all = $self->entries;
+    my $found;
+    for ( 0 .. $#all ){
+        if ( $uri eq $all[$_]->uri ){
+            $found = $_;
+            last;
+        }
+    }
+
+    return $all[$found], $all[$found-1], $all[$found+1];
 }
 
 sub entries {
     my $self = shift;
-    my $index = $self->load_index_db;
-    my @entries = sort { $b->{'epoch'} <=> $a->{'epoch'} } values %$index;
-    return \@entries;
+    $self->sync;
+    my @sorted = 
+        map { $_->[1] } sort { $b->[0] <=> $a->[0] }
+        map { [ $_->created->epoch, $_ ] }
+        values %{$self->db->{'files'}};
+    return @sorted;
 }
 
 
