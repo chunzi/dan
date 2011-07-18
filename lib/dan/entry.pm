@@ -11,7 +11,12 @@ use YAML::Syck;
 use Digest::SHA1  qw/ sha1_hex /;
 use base 'Class::Accessor::Fast';
 
-__PACKAGE__->mk_accessors(qw/ path title slug body created updated day format /);
+__PACKAGE__->mk_accessors(qw/ 
+    path 
+    day slug format
+    created updated 
+    title body
+/);
 
 sub new {
     my $class = shift;
@@ -24,16 +29,7 @@ sub new {
     return $self;
 }
 
-sub shape {
-    my $self = shift;
-    my $path = file $self->path;
-    my $shape = sha1_hex( 
-        map { sha1_hex( $_ ) } ( 
-            $path->basename, 
-            $path->stat->ctime, $path->stat->mtime, 
-        ));
-    return $shape;
-}
+sub mtime { file( shift->path )->stat->mtime };
 
 sub parse {
     my $self = shift;
@@ -42,18 +38,19 @@ sub parse {
 
     # from filename
     my $basename = lc $path->basename;
-    my ( $year, $month, $day, $slug, $format ) = ( $basename =~ /^(\d\d\d\d)-(\d\d)-(\d\d)-?(.*?)\.([a-z]+)$/ );
-    my $ymd = date [ $year, $month, $day, 0, 0, 0 ];
+    my ( $yy, $mm, $dd, $slug, $format ) = ( $basename =~ /^(\d\d\d\d)-(\d\d)-(\d\d)-?(.*?)\.([a-z]+)$/ );
+    my $day = date [ $yy, $mm, $dd, 0, 0, 0 ];
     $format = 'markdown' if $format eq 'md';
 
+    $self->day( $day );
     $self->slug( $slug );
-    $self->day( $ymd );
     $self->format( $format );
 
     # from content
     $self->_parse_markdown if $format eq 'markdown';
     $self->_parse_taskpaper if $format eq 'taskpaper';
 
+    return $self;
 }
 
 sub _parse_markdown {
@@ -78,10 +75,12 @@ sub _parse_markdown {
     $self->body( $body );
 }
 
-sub content {
-    my $self = shift;
-    return markdown $self->body;
-}
+
+# for feeds
+sub issued   { DateTime->from_epoch( epoch => shift->created->epoch ) }
+sub modified { DateTime->from_epoch( epoch => shift->updated->epoch ) }
+
+sub content { markdown shift->body }
 
 sub content_without_title {
     my $self = shift;
@@ -112,17 +111,6 @@ sub _parse_taskpaper {
     my $lines = read_file( $self->path );
 }
 
-sub ctime {
-    my $self = shift;
-    my $path = file $self->path;
-    return date $path->stat->ctime;
-}
-
-sub mtime {
-    my $self = shift;
-    my $path = file $self->path;
-    return date $path->stat->mtime;
-}
 
 sub uri {
     my $self = shift;
@@ -131,16 +119,6 @@ sub uri {
     return $link;
 }
 
-sub issued {
-    my $self = shift;
-    my $date = DateTime->from_epoch( epoch => $self->created->epoch );
-    return $date;
-}
 
-sub modified {
-    my $self = shift;
-    my $date = DateTime->from_epoch( epoch => $self->updated->epoch );
-    return $date;
-}
 
 1;

@@ -31,23 +31,26 @@ sub sync {
     my $index = $self->load_index_db;
     my $remove = {}; map { $remove->{$_}++ } keys %$index;
 
-    for ( @entries ){
-        my $shape = $_->shape;
+    for my $entry ( @entries ){
+        my $path = $entry->path;
+        my $mtime = $entry->mtime;
 
         # skip the same ones
-        if ( exists $index->{$shape} ){
-            delete $remove->{$shape};
+        if ( exists $index->{$path} and $index->{$path}{'mtime'} == $mtime ){
+            delete $remove->{$path};
             next;
         }
 
         # attach updated or newly added
-        $_->parse;
-        $index->{$shape} = { 
-            uri => $_->uri,
-            path => $_->path,
-            created => $_->created, 
-            title => $_->title,
-       };
+        $entry->parse;
+        $index->{$path} = {
+            mtime   => $mtime,
+            path    => $path,
+            uri     => $entry->uri,
+            title   => $entry->title,
+            created => $entry->created,
+            epoch   => $entry->created->epoch,
+        };
     }
 
     # remove the missing ones
@@ -67,7 +70,7 @@ sub load_index_db {
 sub entries {
     my $self = shift;
     my $index = $self->load_index_db;
-    my @entries = sort { $b->{'created'} <=> $a->{'created'} } values %$index;
+    my @entries = sort { $b->{'epoch'} <=> $a->{'epoch'} } values %$index;
     return \@entries;
 }
 
