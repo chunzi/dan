@@ -14,76 +14,71 @@ __PACKAGE__->mk_accessors(qw/
     path 
     day slug format
     created updated 
-    title body
+    body title html
 /);
 
 sub new {
     my $class = shift;
-    my $path = shift;
-    return unless $path;
-
     my $self = bless {}, $class;
-    $self->path( "$path" );
-
     return $self;
 }
 
 sub mtime { file( shift->path )->stat->mtime };
 
-sub parse {
+sub parse_from_file {
     my $self = shift;
-    my $path = file $self->path;
+    my $path = file shift;
     return unless -f $path;
 
-    # from filename
+    $self->path( $path->stringify );
+
     my $basename = lc $path->basename;
     my ( $yy, $mm, $dd, $slug, $format ) = ( $basename =~ /^(\d\d\d\d)-(\d\d)-(\d\d)-?(.*?)\.([a-z]+)$/ );
     my $day = date [ $yy, $mm, $dd, 0, 0, 0 ];
     $format = 'markdown' if $format eq 'md';
 
+
     $self->day( $day );
     $self->slug( $slug );
     $self->format( $format );
-
-    $self->created( date $path->stat->ctime );
-    $self->updated( date $path->stat->mtime );
-
-    # from content
-    $self->_parse_markdown if $format eq 'markdown';
-    $self->_parse_taskpaper if $format eq 'taskpaper';
+    $self->created( $day );
+    $self->updated( $day );
 
 
-    return $self;
-}
-
-sub _parse_markdown {
-    my $self = shift;
-
+    # from file content, remove first blank lines
+    # extract the YAML Front Matter part if it exists
     my $body = read_file( $self->path );
     $body =~ s/^(\s*\n)+//sm;
-
     if ( $body =~ /^---/ ){
         ( my $yaml, $body ) = split /\n---\n/, $body, 2;
-        my $meta = Load( $yaml );
-        $self->created( date $meta->{'created'} );
-        $self->updated( date $meta->{'updated'} );
         $body =~ s/^(\s*\n)+//sm;
+
+        # may support more meta later
+        my $meta = Load( $yaml );
+        $self->created( date $meta->{'created'} ) if $meta->{'created'};
+        $self->updated( date $meta->{'updated'} ) if $meta->{'updated'};
     }
-
-    my ( $title ) = split /\n/, $body;
-    $title =~ s/^#*\s*//;
-    $title =~ s/\s+$//;
-
-    $self->title( $title );
     $self->body( $body );
+
+    # convert taskpaper as markdown text
+    if ( $format eq 'taskpaper' ){
+        $body =~ s/^\s*//smg;
+        $body =~ s/^-\s*$//smg;
+        $body =~ s/^(.*?):\s*$/# $1/smg;
+    }
+    my $html = markdown $body;
+    my ( $title ) = ( $html =~ /<h\d>(.*?)<\/h\d>/ );
+    
+    $self->title( $title );
+    $self->html( $html );
+
+    return $self;
 }
 
 
 # for feeds
 sub issued   { DateTime->from_epoch( epoch => shift->created->epoch ) }
 sub modified { DateTime->from_epoch( epoch => shift->updated->epoch ) }
-
-sub content { markdown shift->body }
 
 sub content_without_title {
     my $self = shift;
@@ -109,16 +104,11 @@ sub yaml_header {
     return $yaml;
 }
 
-sub _parse_taskpaper {
-    my $self = shift;
-    my $lines = read_file( $self->path );
-}
-
-
 sub uri {
     my $self = shift;
     my $ymd = $self->day->strftime("%Y-%m-%d");
-    my $link = sprintf "%s-%s.html", $ymd, $self->slug; 
+    my $name = join '-', grep { defined and $_ ne '' } $ymd, $self->slug;
+    my $link = sprintf "%s.html", $name;
     return $link;
 }
 

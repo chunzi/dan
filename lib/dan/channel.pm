@@ -49,8 +49,7 @@ sub sync {
         my $sha = sha1_hex( $path, $mtime );
 
         if ( not exists $index->{$sha} ){
-            my $entry = dan::entry->new( $path );
-            $entry->parse;
+            my $entry = dan::entry->new->parse_from_file( $path );
             $index->{$sha} = $entry;
 
         }else{
@@ -91,7 +90,7 @@ sub find {
         }
     }
 
-    return $all[$found], $all[$found-1], $all[$found+1];
+    return $all[$found], $all[$found+1], $all[$found-1];
 }
 
 sub entries {

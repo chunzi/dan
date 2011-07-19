@@ -1,5 +1,5 @@
 <div class="post round">
-    [% post.content %]
+    [% post.html %]
     <div class="date">[% post.created.strftime('%A, %B %e, %Y') %]</div>
 </div>
 

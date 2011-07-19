@@ -13,11 +13,16 @@ our $VERSION = '0.1';
 
 my $data_dir = dir("$FindBin::Bin/../data");
 my $posts = dan::channel->new('./data/posts');
+my $taskpapers = dan::channel->new('./data/taskpapers');
 
 get '/' => sub {
+    forward '/posts';
+};
+
+get '/posts' => sub {
     my @posts = $posts->page( 1, 20 );
     var posts => \@posts;
-    template 'index', vars;
+    template 'posts', vars;
 };
 
 get '/post/:uri' => sub {
@@ -43,6 +48,24 @@ get '/feed' => sub {
     );
 };
 
+#----------------------------
+# taskpapers
+
+
+get '/taskpapers' => sub {
+    my @taskpapers = $taskpapers->page( 1, 20 );
+    var taskpapers => \@taskpapers;
+    template 'taskpapers', vars;
+};
+
+get '/taskpaper/:uri' => sub {
+    my $uri = params->{'uri'};
+    my ( $taskpaper, $prev, $next ) = $taskpapers->find( $uri );
+    var taskpaper => $taskpaper;
+    var prev_taskpaper => $prev;
+    var next_taskpaper => $next;
+    template 'taskpaper', vars;
+};
 
 
 true;

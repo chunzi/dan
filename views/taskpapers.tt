@@ -1,0 +1,10 @@
+<div class="entries round">
+<ul class="entries">
+    [% FOREACH taskpaper = taskpapers %]
+    <li>
+        <span class="created">[% taskpaper.created.strftime("%d %b %Y") %]</span>
+        <span class="title"><a href="/taskpaper/[% taskpaper.uri %]">[% taskpaper.title %]</a><span>
+    </li>
+    [% END %]
+</ul>
+</div>
