@@ -14,7 +14,9 @@ a { color: #0066CC; text-decoration: none; }
     -webkit-box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
-.post { color: #345; background: #FFF; margin: 6em 0; padding: 70px 80px; font-size: 0.9em; line-height: 1.8; }
+.post, .taskpaper { color: #345; background: #FFF; margin: 6em 0; padding: 70px 80px; font-size: 0.9em; line-height: 1.8; }
+.taskpaper p { color: #999; }
+
 h1, h2, h3, h4, h5, h6 { color: #111111; font-weight: normal; }
 h1 { margin: 0 0 40px; }
 p { margin: 0 0 1.5em;  }
@@ -38,6 +40,7 @@ blockquote {
 }
 
 .post .date { font-size: 0.8em; margin-top: 80px; color: #666; text-align: right;  }
+.taskpaper .date { font-size: 0.8em; margin-top: 80px; color: #666; text-align: right;  }
 
 .footer { margin-bottom: 6em; border-top: dashed 1px #ddd;  padding: 3em 5em; font-size: 0.7em; color: #999; line-height: 1.8; text-shadow: 1px 1px 0 #fff; }
 .footer .column { float: left; margin-right: 4em; }
