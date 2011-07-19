@@ -48,7 +48,6 @@ sub parse_from_file {
     # from file content, remove first blank lines
     # extract the YAML Front Matter part if it exists
     my $body = read_file( $self->path );
-    $body =~ s/^(\s*\n)+//sm;
     if ( $body =~ /^---/ ){
         ( my $yaml, $body ) = split /\n---\n/, $body, 2;
         $body =~ s/^(\s*\n)+//sm;
@@ -62,9 +61,9 @@ sub parse_from_file {
 
     # convert taskpaper as markdown text
     if ( $format eq 'taskpaper' ){
-        $body =~ s/^\s*//smg;
-        $body =~ s/^-\s*$//smg;
-        $body =~ s/^(.*?):\s*$/# $1/smg;
+        $body =~ s/^(.*?):\s*$/# $1\n/smg;
+        $body =~ s/^\s+-\s+$//smg; # remove empty list
+        $body =~ s/^\s+-\s+/- /smg;
     }
     my $html = markdown $body;
     my ( $title ) = ( $html =~ /<h\d>(.*?)<\/h\d>/ );
